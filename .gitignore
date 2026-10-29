@@ -32,3 +32,6 @@ desktop.ini
 # Berkas sementara
 tmp/
 *.tmp
+
+# Catatan berbagi lokal (URL tunnel bersifat sementara)
+BAGIKAN-ke-rekan.txt
