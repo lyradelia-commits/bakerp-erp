@@ -5,12 +5,13 @@ persediaan, produksi berbasis resep (BOM), penjualan (POS), dan keuangan dalam s
 
 > Tugas UTS Mata Kuliah Enterprise Information System (EIS)
 
+**Demo interaktif (permanen, tanpa install):** https://lyradelia-commits.github.io/bakerp-erp/demo/
 **Halaman profil proyek:** https://lyradelia-commits.github.io/bakerp-erp/
 
-> **Catatan:** GitHub Pages hanya menyajikan berkas statis, jadi halaman di atas berisi profil
-> proyek, tangkapan layar, dan laporan PDF — bukan aplikasi interaktifnya. Aplikasi BakeERP
-> memerlukan server Python yang berjalan; jalankan secara lokal dengan langkah di bawah, atau
-> bagikan sesi sementara memakai tunnel (lihat bagian *Membagikan demo ke rekan*).
+> Demo di GitHub Pages menjalankan seluruh logika aplikasi di dalam browser
+> (`site/demo/api-local.js`) memakai data contoh 31 hari, sehingga bisa dicoba tanpa server.
+> Perubahan tersimpan di localStorage peramban masing-masing pengunjung. Aplikasi versi
+> sebenarnya (server Python + SQLite/MySQL) dijalankan dengan langkah di bawah.
 
 ## Menjalankan aplikasi
 
@@ -175,6 +176,29 @@ tetap diperlukan, jadi data tidak terbuka bagi yang tidak punya akun.
 
 Batasan free tier: tunnel mati otomatis setelah **60 menit**, dan URL berubah setiap kali
 dinyalakan ulang. Cocok untuk demo presentasi, bukan untuk penggunaan permanen.
+
+
+## Versi demo statis (GitHub Pages)
+
+Folder `site/demo/` berisi versi aplikasi yang berjalan sepenuhnya di browser:
+
+| Berkas | Fungsi |
+|---|---|
+| `index.html` | kerangka halaman + pita "mode demo" |
+| `api-local.js` | seluruh logika `core.py` ditulis ulang dalam JavaScript |
+| `data.json` | 4.163 baris data contoh (hasil `docs/export_demo_data.py`) |
+| `app.js`, `pages.js`, `style.css` | disalin dari `static/`, dipakai ulang tanpa diubah |
+
+`static/app.js` memeriksa `window.LOCAL_API`; bila ada, semua permintaan API dilayani di
+browser alih-alih lewat `fetch`. Berkat itu antarmuka yang sama dipakai untuk kedua mode.
+
+Membangun ulang demo:
+
+```bash
+python docs/export_demo_data.py          # segarkan site/demo/data.json dari bakery.db
+cp static/{app.js,pages.js,style.css} site/demo/
+node tests/test_demo_node.js             # uji logika demo (32 skenario)
+```
 
 ## Membangun ulang laporan
 
