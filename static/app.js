@@ -5,6 +5,21 @@
 const API = {
   token: localStorage.getItem('bakerp_token') || '',
   async req(method, path, body) {
+    // Mode demo: bila api-local.js dimuat, seluruh permintaan dilayani di browser
+    // (tanpa server Python) memakai data yang ditanam di halaman.
+    if (window.LOCAL_API) {
+      try {
+        return await window.LOCAL_API.handle(method, path, body, API.token);
+      } catch (e) {
+        if (e && e.status === 401) {
+          localStorage.removeItem('bakerp_token');
+          API.token = '';
+          renderLogin('Sesi berakhir, silakan login kembali.');
+          throw new Error('unauthorized');
+        }
+        throw new Error((e && e.message) || 'Terjadi kesalahan.');
+      }
+    }
     const opt = { method, headers: { 'Content-Type': 'application/json' } };
     if (API.token) opt.headers['Authorization'] = 'Bearer ' + API.token;
     if (body !== undefined) opt.body = JSON.stringify(body);

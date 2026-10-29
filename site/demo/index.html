@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>BakeERP — Demo Interaktif (Roti Kita Bakery)</title>
+  <meta name="description" content="Demo interaktif aplikasi ERP bakery: pembelian, persediaan, produksi berbasis resep, penjualan (POS), dan laporan keuangan dalam satu sistem terintegrasi." />
+  <link rel="stylesheet" href="style.css" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🥖</text></svg>" />
+
+  <style>
+    /* ---- Pita mode demo ---- */
+    #demoBar {
+      position: fixed; left: 0; right: 0; bottom: 0; z-index: 200;
+      background: #221a14; color: #f3ece4;
+      font-family: "Segoe UI", system-ui, sans-serif;
+      font-size: 12.5px; line-height: 1.45;
+      padding: 9px 16px;
+      display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
+      box-shadow: 0 -6px 20px -8px rgba(0,0,0,.45);
+    }
+    #demoBar .dot {
+      width: 8px; height: 8px; border-radius: 50%; background: #4ade80;
+      flex: 0 0 8px; box-shadow: 0 0 0 3px rgba(74,222,128,.2);
+    }
+    #demoBar b { color: #fff; }
+    #demoBar .sp { flex: 1; }
+    #demoBar a, #demoBar button {
+      color: #fbbf24; background: none; border: 0; padding: 0;
+      font: inherit; font-weight: 650; cursor: pointer; text-decoration: none;
+      white-space: nowrap;
+    }
+    #demoBar a:hover, #demoBar button:hover { text-decoration: underline; }
+    #demoBar .sep { color: #6b5b4c; }
+    body { padding-bottom: 46px; }
+
+    @media (max-width: 720px) {
+      #demoBar { font-size: 11.5px; padding: 8px 12px; gap: 8px; }
+      #demoBar .hide-sm { display: none; }
+    }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+  <div class="toasts" id="toasts"></div>
+
+  <!-- Mode demo: seluruh API dilayani di browser, tanpa server -->
+  <script src="api-local.js"></script>
+  <script src="app.js"></script>
+  <script src="pages.js"></script>
+
+  <div id="demoBar">
+    <span class="dot"></span>
+    <span><b>Mode demo</b> — data disimpan di browser Anda sendiri, tidak mengubah data orang lain.</span>
+    <span class="sep hide-sm">|</span>
+    <span class="hide-sm">Login: <b>admin</b> / <b>admin123</b></span>
+    <span class="sp"></span>
+    <button id="btnReset" title="Kembalikan data contoh ke kondisi awal">Reset data</button>
+    <span class="sep">|</span>
+    <a href="../index.html">Tentang proyek</a>
+  </div>
+
+  <script>
+    // Tombol reset: kembalikan data contoh ke kondisi awal
+    document.getElementById('btnReset').addEventListener('click', function () {
+      if (!confirm('Kembalikan seluruh data demo ke kondisi awal?\n' +
+                   'Semua transaksi yang Anda buat akan hilang.')) return;
+      if (!window.LOCAL_API) return;
+      window.LOCAL_API.reset().then(function () {
+        localStorage.removeItem('bakerp_token');
+        location.hash = '';
+        location.reload();
+      }).catch(function (e) {
+        alert('Gagal mereset data: ' + e.message);
+      });
+    });
+
+    // Beri tahu bila dibuka lewat file:// (fetch data.json bisa diblokir sebagian browser)
+    if (location.protocol === 'file:') {
+      var b = document.getElementById('demoBar');
+      b.style.background = '#7f1d1d';
+      b.querySelector('span:nth-child(2)').innerHTML =
+        '<b>Dibuka lewat file://</b> — sebagian browser memblokir pemuatan data. ' +
+        'Jalankan lewat server lokal (mis. <code>python -m http.server</code>).';
+    }
+  </script>
+</body>
+</html>

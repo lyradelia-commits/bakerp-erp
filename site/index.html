@@ -174,7 +174,7 @@
     <a class="lnk" href="#integrasi">Integrasi</a>
     <a class="lnk" href="#jalankan">Cara Menjalankan</a>
     <a class="lnk" href="#tampilan">Tampilan</a>
-    <a class="btn primary sm" href="https://github.com/lyradelia-commits/bakerp-erp" target="_blank" rel="noopener">Lihat Kode</a>
+    <a class="btn primary sm" href="demo/index.html">Coba Demo</a>
   </div>
 </header>
 
@@ -191,21 +191,24 @@
       sekali, lalu mengalir otomatis ke seluruh modul terkait.
     </p>
     <div class="cta">
-      <a class="btn primary" href="https://github.com/lyradelia-commits/bakerp-erp" target="_blank" rel="noopener">Buka Repositori GitHub</a>
-      <a class="btn" href="#jalankan">Cara Menjalankan</a>
-      <a class="btn" href="Laporan_UTS_EIS_ERP_Bakery.pdf" target="_blank" rel="noopener">Baca Laporan (PDF)</a>
+      <a class="btn primary" href="demo/index.html" style="font-size:16px;padding:14px 24px">▶ Coba Demo Interaktif</a>
+      <a class="btn" href="https://github.com/lyradelia-commits/bakerp-erp" target="_blank" rel="noopener">Lihat Kode</a>
+      <a class="btn" href="Laporan_UTS_EIS_ERP_Bakery.pdf" target="_blank" rel="noopener">Laporan (PDF)</a>
     </div>
 
-    <div class="notice">
-      <span class="ic">ℹ️</span>
+    <div class="notice" style="background:#ecfdf3;border-color:#bbe7c9;border-left-color:#157f4b">
+      <span class="ic">✅</span>
       <div>
-        <b>Catatan: halaman ini hanya profil proyek, bukan aplikasinya.</b>
-        <p>
-          BakeERP adalah aplikasi <b>full-stack</b> (server Python + basis data). GitHub Pages hanya
-          dapat menyajikan berkas statis, sehingga aplikasi interaktifnya tidak bisa berjalan di sini.
-          Untuk mencoba aplikasi yang sesungguhnya, jalankan di komputer Anda dengan langkah pada
-          bagian <a href="#jalankan">Cara Menjalankan</a> — seluruh kode dan data contoh sudah tersedia
-          di repositori.
+        <b style="color:#0f5c36">Demo interaktif bisa langsung dicoba — tanpa install apa pun.</b>
+        <p style="color:#215c3d">
+          Klik <a href="demo/index.html"><b>Coba Demo Interaktif</b></a> untuk membuka aplikasinya
+          langsung di browser. Semua modul berfungsi: transaksi penjualan benar-benar mengurangi
+          stok, produksi memotong bahan sesuai resep, dan laba rugi terhitung otomatis.
+          Login: <code class="inl">admin</code> / <code class="inl">admin123</code>.
+          <br /><br />
+          Demo ini menjalankan logika aplikasi di dalam browser memakai data contoh 31 hari.
+          Perubahan yang Anda buat hanya tersimpan di browser Anda sendiri. Versi aslinya
+          (server Python + SQLite/MySQL) tersedia di repositori.
         </p>
       </div>
     </div>
@@ -268,7 +271,13 @@
 
     <div class="grid g2">
       <div>
-        <h3 style="margin-bottom:10px">1. Ambil kode</h3>
+        <h3 style="margin-bottom:10px">Cara tercepat: coba demo</h3>
+        <p style="font-size:14.5px;color:var(--ink-2)">
+          Buka <a href="demo/index.html">demo interaktif</a> — tidak perlu install apa pun.
+          Semua modul berfungsi dengan data contoh 31 hari.
+        </p>
+
+        <h3 style="margin-bottom:10px;margin-top:20px">1. Ambil kode</h3>
         <pre>git clone https://github.com/lyradelia-commits/bakerp-erp.git
 cd bakerp-erp</pre>
 
@@ -311,8 +320,8 @@ BAKERP_BACKEND=mysql python app.py</pre>
     <h2>Tampilan aplikasi</h2>
     <p class="sub">Tangkapan layar dari aplikasi yang benar-benar dijalankan di browser.</p>
     <div class="shots">
-      <figure><img src="img/02-dashboard.png" alt="Dashboard BakeERP" loading="lazy" />
-        <figcaption>Dashboard — KPI, tren 7 hari, dan peringatan stok kritis</figcaption></figure>
+      <figure><img src="img/demo-dashboard.png" alt="Demo interaktif BakeERP" loading="lazy" />
+        <figcaption>Dashboard — bisa langsung Anda coba di <a href="demo/index.html">demo interaktif</a></figcaption></figure>
       <figure><img src="img/03-pos-penjualan.png" alt="Modul penjualan POS" loading="lazy" />
         <figcaption>Penjualan (POS) — keranjang dan riwayat transaksi</figcaption></figure>
       <figure><img src="img/04-produksi.png" alt="Modul produksi" loading="lazy" />
