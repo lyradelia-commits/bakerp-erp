@@ -210,6 +210,7 @@ function layout(route) {
   root.innerHTML = `
   <div class="app">
     <aside class="sidebar" id="sidebar">
+      <button class="nav-close" id="navClose" aria-label="Tutup menu">&times;</button>
       <div class="brand">
         <div class="brand-mark">B</div>
         <div>
@@ -246,7 +247,8 @@ function layout(route) {
       </div>
       <div class="page" id="page"></div>
     </div>
-  </div>`;
+  </div>
+  <div class="nav-backdrop" id="navBackdrop"></div>`;
 
   document.getElementById('logoutBtn').addEventListener('click', async (e) => {
     e.preventDefault();
@@ -254,12 +256,63 @@ function layout(route) {
     localStorage.removeItem('bakerp_token'); API.token = ''; ME = null;
     renderLogin();
   });
-  document.getElementById('burger').addEventListener('click', () => {
-    document.getElementById('sidebar').classList.toggle('open');
+
+  // ---- Menu samping di layar kecil ----
+  const sidebar = document.getElementById('sidebar');
+  const backdrop = document.getElementById('navBackdrop');
+  const burger = document.getElementById('burger');
+
+  const tutupMenu = () => {
+    sidebar.classList.remove('open');
+    backdrop.classList.remove('show');
+    document.body.classList.remove('nav-open');
+  };
+  const bukaMenu = () => {
+    sidebar.classList.add('open');
+    backdrop.classList.add('show');
+    document.body.classList.add('nav-open');
+  };
+  const toggleMenu = () => {
+    if (sidebar.classList.contains('open')) tutupMenu(); else bukaMenu();
+  };
+
+  burger.addEventListener('click', toggleMenu);
+  document.getElementById('navClose').addEventListener('click', tutupMenu);
+  backdrop.addEventListener('click', tutupMenu);
+
+  // Menutup menu setiap kali sebuah halaman dipilih — ini yang sebelumnya
+  // terlewat sehingga menu tetap menutupi layar setelah berpindah halaman.
+  sidebar.querySelectorAll('.nav a[data-r]').forEach((a) => {
+    a.addEventListener('click', tutupMenu);
   });
+
+  // Tombol Esc & perubahan ukuran layar ditangani sekali di boot()
   markActive(route);
   refreshPOBadge();
   tampilkanDbInfo();
+}
+
+/* Menutup menu samping dengan tombol Esc (hanya berlaku saat menu terbuka). */
+function onEscMenu(e) {
+  if (e.key !== 'Escape') return;
+  const sidebar = document.getElementById('sidebar');
+  const backdrop = document.getElementById('navBackdrop');
+  if (sidebar && sidebar.classList.contains('open')) {
+    sidebar.classList.remove('open');
+    if (backdrop) backdrop.classList.remove('show');
+    document.body.classList.remove('nav-open');
+  }
+}
+
+/* Bila layar dilebarkan melewati breakpoint, pastikan sisa status menu bersih. */
+function onResizeMenu() {
+  if (window.innerWidth > 860) {
+    const sidebar = document.getElementById('sidebar');
+    const backdrop = document.getElementById('navBackdrop');
+    if (sidebar) sidebar.classList.remove('open');
+    if (backdrop) backdrop.classList.remove('show');
+    document.body.classList.remove('nav-open');
+  }
 }
 
 /* Menampilkan basis data yang sedang aktif di kaki sidebar,
@@ -442,3 +495,8 @@ async function boot() {
 
 window.addEventListener('hashchange', router);
 window.addEventListener('DOMContentLoaded', boot);
+
+// Ditambahkan sekali di sini (bukan di layout) agar tidak menumpuk
+// setiap kali halaman di-render ulang.
+document.addEventListener('keydown', onEscMenu);
+window.addEventListener('resize', onResizeMenu);
