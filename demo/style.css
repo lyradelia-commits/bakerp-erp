@@ -300,15 +300,91 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
 @media (max-width: 860px) {
   .app { grid-template-columns: 1fr; }
   .sidebar {
-    position: fixed; inset: 0 auto 0 0; width: 250px; z-index: 80;
-    transform: translateX(-100%); transition: transform .2s;
+    position: fixed; inset: 0 auto 0 0; width: 268px; max-width: 84vw; z-index: 100;
+    transform: translateX(-100%); transition: transform .22s ease;
+    box-shadow: 4px 0 24px -8px rgba(0,0,0,.45);
   }
   .sidebar.open { transform: none; }
+  body.nav-open { overflow: hidden; }
   .page { padding: 16px 14px 70px; }
   .topbar { padding: 12px 14px; }
   .g3, .g2 { grid-template-columns: 1fr; }
   .login-wrap { grid-template-columns: 1fr; }
   .login-art { display: none; }
 }
+/* Tombol tutup menu (hanya tampil di layar kecil) */
+.nav-close { display: none; }
+@media (max-width: 860px) {
+  .nav-close {
+    display: inline-flex; align-items: center; justify-content: center;
+    position: absolute; top: 14px; right: 12px;
+    width: 34px; height: 34px; border-radius: 9px;
+    background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.14);
+    color: #f3ece4; font-size: 20px; line-height: 1; cursor: pointer;
+  }
+  .nav-close:hover { background: rgba(255,255,255,.16); }
+  /* Ruang agar judul brand tidak bertabrakan dengan tombol tutup */
+  .brand { padding-right: 46px; }
+
+  /* Menu dirapatkan agar lebih banyak item muat tanpa menggulir */
+  .brand { padding: 15px 16px 12px; }
+  .nav { padding: 8px 8px 18px; }
+  .nav-group { margin: 10px 0 3px; padding: 0 10px; font-size: 10px; }
+  .nav a { padding: 7px 10px; font-size: 13.5px; margin-bottom: 1px; }
+  .nav a .ic { width: 17px; height: 17px; flex: 0 0 17px; }
+  .side-foot { padding: 10px 14px; }
+}
+/* Latar gelap di belakang menu saat terbuka */
+.nav-backdrop {
+  display: none;
+  position: fixed; inset: 0; z-index: 90;
+  background: rgba(34,26,20,.45);
+  -webkit-backdrop-filter: blur(2px); backdrop-filter: blur(2px);
+  opacity: 0; transition: opacity .22s ease;
+}
+@media (max-width: 860px) {
+  .nav-backdrop.show { display: block; opacity: 1; }
+}
 .burger { display: none; background: #fff; border: 1px solid var(--line); border-radius: 9px; padding: 7px 10px; cursor: pointer; }
 @media (max-width: 860px) { .burger { display: inline-flex; } }
+
+/* ---------- Penyesuaian layar sangat kecil (ponsel) ---------- */
+@media (max-width: 520px) {
+  /* Chip pengguna cukup avatar agar judul halaman punya ruang */
+  .userchip { padding: 4px; border-radius: 50%; }
+  .userchip .small { display: none; }
+  .topbar { gap: 10px; }
+  .topbar .title { font-size: 16px; }
+  .topbar .crumb { font-size: 11.5px; }
+
+  /* Kartu KPI: angka dikecilkan agar tidak menyentuh tepi */
+  .kpi { padding: 13px 14px; }
+  .kpi .label { font-size: 10.5px; letter-spacing: .05em; }
+  .kpi .value { font-size: 19px; margin-top: 4px; }
+  .kpi .sub { font-size: 11.5px; }
+
+  /* Judul kartu & badge ditumpuk agar tidak berdesakan */
+  .card-h { flex-wrap: wrap; row-gap: 6px; padding: 13px 15px; }
+  .card-b { padding: 14px 15px; }
+  .card-b.flush { padding: 0; }
+
+  /* Tombol aksi memenuhi lebar agar mudah disentuh */
+  .btn { padding: 10px 14px; }
+  .btn.sm { padding: 8px 11px; }
+
+  /* Modal hampir penuh layar */
+  .overlay { padding: 10px; }
+  .modal { max-height: 94vh; border-radius: 14px; }
+  .modal-h { padding: 13px 15px; }
+  .modal-b { padding: 14px 15px; }
+  .modal-f { padding: 12px 15px; }
+
+  /* Grafik tren: batang lebih tipis, label lebih kecil */
+  .chart { gap: 5px; height: 148px; }
+  .chart .bar .val { font-size: 9.5px; }
+  .chart .bar .cap { font-size: 9.5px; }
+
+  /* Keranjang POS: tombol qty lebih besar agar mudah dipencet */
+  .qtybox button { width: 30px; height: 30px; font-size: 15px; }
+  .qtybox span { min-width: 26px; font-size: 14px; }
+}
