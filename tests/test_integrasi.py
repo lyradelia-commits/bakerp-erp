@@ -23,7 +23,9 @@ PORT = 8099
 DB = os.path.join(BASE_DIR, "tests", "test_bakery.db")
 URL = f"http://127.0.0.1:{PORT}"
 
-# Backend diuji: "sqlite" (default) atau "mysql"
+# Backend diuji: "sqlite" (default, aman) atau "mysql"
+# PENTING: default sengaja "sqlite" agar pengujian tidak pernah menyentuh
+# database asli. Saat menguji MySQL, dipakai database terpisah (bakerp_test).
 BACKEND = (os.environ.get("BAKERP_TEST_BACKEND") or "sqlite").strip().lower()
 MYSQL_DB = os.environ.get("BAKERP_TEST_MYSQL_DB", "bakerp_test")
 
@@ -87,7 +89,10 @@ def main():
     else:
         if os.path.exists(DB):
             os.remove(DB)
-        env = dict(os.environ, BAKERP_DB=DB, PYTHONIOENCODING="utf-8")
+        # BAKERP_BACKEND dipaksa "sqlite" agar mode auto tidak diam-diam
+        # memilih MySQL dan menulis ke database asli.
+        env = dict(os.environ, BAKERP_BACKEND="sqlite", BAKERP_DB=DB,
+                   PYTHONIOENCODING="utf-8")
     entry_file = "wsgi.py" if ENTRY == "wsgi" else "app.py"
     srv = subprocess.Popen([sys.executable, entry_file, "--port", str(PORT)], cwd=BASE_DIR,
                            env=env, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)

@@ -205,10 +205,17 @@
           langsung di browser. Semua modul berfungsi: transaksi penjualan benar-benar mengurangi
           stok, produksi memotong bahan sesuai resep, dan laba rugi terhitung otomatis.
           Login: <code class="inl">admin</code> / <code class="inl">admin123</code>.
+        </p>
+        <p style="color:#215c3d;margin-top:10px">
+          <b>Perlu diketahui:</b> demo ini menyimpan data di <b>browser masing-masing pengunjung</b>,
+          bukan di database. Artinya kalau Anda menambah bahan atau membuat transaksi, orang lain
+          <b>tidak akan melihatnya</b> — dan data kembali ke awal bila browser dibersihkan
+          atau tombol <i>Reset data</i> diklik.
           <br /><br />
-          Demo ini menjalankan logika aplikasi di dalam browser memakai data contoh 31 hari.
-          Perubahan yang Anda buat hanya tersimpan di browser Anda sendiri. Versi aslinya
-          (server Python + SQLite/MySQL) tersedia di repositori.
+          Untuk data yang benar-benar terpusat (semua pengguna melihat hal yang sama), jalankan
+          versi aslinya: server Python + basis data MySQL/SQLite. Panduannya ada di
+          <a href="https://github.com/lyradelia-commits/bakerp-erp/blob/main/DEPLOY.md"
+             target="_blank" rel="noopener">DEPLOY.md</a>.
         </p>
       </div>
     </div>

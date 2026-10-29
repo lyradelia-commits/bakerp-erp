@@ -62,17 +62,40 @@ Penjualan → stok produk turun → pendapatan + HPP → kas masuk
 Keuangan  → laba kotor = pendapatan − HPP; laba bersih = laba kotor − beban
 ```
 
-## Dua pilihan basis data
+## Basis data: satu sumber kebenaran
 
-Aplikasi berjalan di atas **SQLite** (bawaan) atau **MySQL/MariaDB**. Logika bisnis ditulis
-sekali di `core.py`; pemilihan mesin diatur oleh `db.py` lewat variabel lingkungan.
+Aplikasi mendukung **MySQL** dan **SQLite**. Logika bisnis ditulis sekali di `core.py`;
+pemilihan mesin diatur `db.py` lewat `BAKERP_BACKEND`.
 
-| | SQLite (bawaan) | MySQL |
+| Mode | Perilaku |
+|---|---|
+| `auto` (bawaan) | coba MySQL; bila tidak ada server, pakai SQLite |
+| `mysql` | wajib MySQL |
+| `sqlite` | wajib SQLite |
+
+Mode `auto` dipilih supaya satu kode jalan di dua tempat: **di laptop memakai MySQL**
+(server Laragon), **di hosting gratis otomatis SQLite** (tidak ada MySQL di sana).
+
+**Basis data yang aktif selalu terlihat di kaki sidebar aplikasi** — tertulis
+`MySQL · bakerp` atau `SQLite · bakery.db`. Jadi tidak perlu menebak.
+
+### Sumber kebenaran: MySQL
+
+Sesuai keputusan pemakaian, **MySQL `bakerp` adalah acuan**. Dua artefak lain diturunkan
+darinya agar tidak pernah berbeda diam-diam:
+
+| Artefak | Dipakai untuk | Cara membuat |
 |---|---|---|
-| Persiapan | tidak ada | server MySQL harus jalan di port 3306 |
-| Penyimpanan | satu berkas `bakery.db` | database `bakerp` di server |
-| Cocok untuk | demo cepat, laptop dosen | lingkungan yang mewajibkan DBMS server |
-| Buka dengan | DB Browser for SQLite, DBeaver (driver SQLite) | DBeaver / MySQL Workbench (host `127.0.0.1`, port `3306`) |
+| MySQL `bakerp` | aplikasi lokal (acuan) | `python migrate_to_mysql.py` |
+| `bakery.db` | hosting PythonAnywhere | `python sync_db.py` |
+| `site/demo/data.json` | demo statis GitHub Pages | `python sync_db.py` |
+
+```bash
+python sync_db.py        # MySQL -> bakery.db + data.json
+python sync_db.py --cek  # bandingkan jumlah baris, tanpa menulis
+```
+
+`--cek` akan menampilkan tabel perbandingan dan menandai baris yang berbeda.
 
 ### Menjalankan dengan MySQL
 
@@ -83,12 +106,11 @@ sekali di `core.py`; pemilihan mesin diatur oleh `db.py` lewat variabel lingkung
 # 2. migrasi skema + seluruh data dari SQLite ke MySQL
 python migrate_to_mysql.py
 
-# 3. jalankan aplikasi dengan backend MySQL
-BAKERP_BACKEND=mysql python app.py
+# 3. jalankan (mode auto akan mendeteksi MySQL sendiri)
+python app.py
 ```
 
-Di Windows bisa juga klik dua kali **`Mulai BakeERP (MySQL).bat`** — skrip itu menyalakan
-MySQL bila belum jalan, lalu membuka aplikasi dalam mode MySQL.
+Di Windows bisa juga klik dua kali **`Mulai BakeERP (MySQL).bat`**.
 
 Konfigurasi MySQL dapat diubah lewat variabel lingkungan:
 `BAKERP_MYSQL_HOST`, `BAKERP_MYSQL_PORT`, `BAKERP_MYSQL_USER`,

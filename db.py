@@ -1,12 +1,18 @@
 """
 Pemilih backend basis data untuk BakeERP.
 
-Default: SQLite (berkas bakery.db) — tidak perlu server apa pun.
-Alternatif: MySQL/MariaDB — aktifkan dengan variabel lingkungan BAKERP_BACKEND=mysql.
+Tiga mode, diatur lewat variabel lingkungan BAKERP_BACKEND:
 
-Contoh:
-    python app.py                                   -> SQLite (bawaan)
-    BAKERP_BACKEND=mysql python app.py              -> MySQL localhost:3306/bakerp
+    auto    (bawaan)  -> coba MySQL; bila tidak tersedia, pakai SQLite
+    mysql             -> wajib MySQL (gagal keras bila tidak tersedia)
+    sqlite            -> wajib SQLite
+
+Mode `auto` dipilih sebagai bawaan karena memberi perilaku yang tepat di dua
+lingkungan sekaligus tanpa mengubah kode:
+  * Di laptop pengembang  -> MySQL lokal (127.0.0.1:3306/bakerp) terdeteksi,
+                             sehingga data kuliah tersimpan di DBMS server.
+  * Di hosting gratis     -> tidak ada MySQL, otomatis jatuh ke SQLite
+                             (satu-satunya pilihan yang tersedia di sana).
 
 Konfigurasi MySQL dapat diubah lewat variabel lingkungan:
     BAKERP_MYSQL_HOST      (default 127.0.0.1)
@@ -17,12 +23,13 @@ Konfigurasi MySQL dapat diubah lewat variabel lingkungan:
 """
 
 import os
+import socket
 import sqlite3
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 DB_PATH = os.environ.get("BAKERP_DB") or os.path.join(BASE_DIR, "bakery.db")
 
-BACKEND = (os.environ.get("BAKERP_BACKEND") or "sqlite").strip().lower()
+MODE = (os.environ.get("BAKERP_BACKEND") or "auto").strip().lower()
 
 MYSQL = {
     "host": os.environ.get("BAKERP_MYSQL_HOST", "127.0.0.1"),
@@ -31,6 +38,33 @@ MYSQL = {
     "password": os.environ.get("BAKERP_MYSQL_PASSWORD", ""),
     "database": os.environ.get("BAKERP_MYSQL_DB", "bakerp"),
 }
+
+
+def _mysql_bisa_dihubungi(timeout=1.5):
+    """Cek cepat apakah ada server MySQL yang menerima koneksi di host:port."""
+    try:
+        with socket.create_connection((MYSQL["host"], MYSQL["port"]), timeout=timeout):
+            return True
+    except OSError:
+        return False
+
+
+def _pilih_backend():
+    if MODE == "sqlite":
+        return "sqlite"
+    if MODE == "mysql":
+        return "mysql"
+    # mode auto
+    if _mysql_bisa_dihubungi():
+        try:
+            import dbmysql  # noqa: F401
+            return "mysql"
+        except ImportError:
+            return "sqlite"
+    return "sqlite"
+
+
+BACKEND = _pilih_backend()
 
 if BACKEND == "mysql":
     import dbmysql
@@ -41,6 +75,9 @@ if BACKEND == "mysql":
 
     def deskripsi():
         return f"MySQL {MYSQL['host']}:{MYSQL['port']}/{MYSQL['database']}"
+
+    def ringkas():
+        return f"MySQL · {MYSQL['database']}"
 
     def hapus_database():
         """Menghapus seluruh isi database MySQL (untuk reset)."""
@@ -69,6 +106,9 @@ else:
 
     def deskripsi():
         return f"SQLite {DB_PATH}"
+
+    def ringkas():
+        return "SQLite · bakery.db"
 
     def hapus_database():
         if os.path.exists(DB_PATH):

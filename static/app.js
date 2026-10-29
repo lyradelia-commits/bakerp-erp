@@ -226,6 +226,8 @@ function layout(route) {
       </nav>
       <div class="side-foot">
         <div>${esc(ME ? ME.nama : '')} · <span style="text-transform:capitalize">${esc(ME ? ME.role : '')}</span></div>
+        <div id="dbInfo" class="small" style="margin-top:6px;color:#8d7a68;font-size:11px"
+             title="Basis data yang sedang dipakai aplikasi">&nbsp;</div>
         <a href="#" id="logoutBtn" style="color:#c9b8a6;display:inline-flex;gap:6px;align-items:center;margin-top:8px">${svg('logout', 15)} Keluar</a>
       </div>
     </aside>
@@ -257,6 +259,31 @@ function layout(route) {
   });
   markActive(route);
   refreshPOBadge();
+  tampilkanDbInfo();
+}
+
+/* Menampilkan basis data yang sedang aktif di kaki sidebar,
+   supaya jelas data ini tersimpan di mana (MySQL, SQLite, atau mode demo). */
+async function tampilkanDbInfo() {
+  const el = document.getElementById('dbInfo');
+  if (!el) return;
+  try {
+    const info = await API.get('/api/info');
+    let teks, warna = '#8d7a68';
+    if (info.backend === 'demo-browser') {
+      teks = '⚠ Demo — data di browser ini saja';
+      warna = '#fbbf24';
+    } else if (info.backend === 'mysql') {
+      teks = '🗄 MySQL · ' + (info.database.split('/').pop() || 'bakerp');
+    } else {
+      teks = '🗄 SQLite · bakery.db';
+    }
+    el.textContent = teks;
+    el.style.color = warna;
+    el.title = 'Basis data: ' + info.database;
+  } catch (e) {
+    el.textContent = '';
+  }
 }
 
 function markActive(route) {
