@@ -18,12 +18,40 @@ import hashlib
 import os
 import random
 import secrets
-from datetime import datetime, timedelta, date
+from datetime import datetime, timedelta, date, timezone
 
 import db
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 DB_PATH = db.DB_PATH
+
+# ----------------------------------------------------------------------------
+# Zona waktu usaha
+# ----------------------------------------------------------------------------
+# Server hosting umumnya berjalan pada UTC. Bila tanggal dihitung dengan
+# hari_ini(), maka antara pukul 00:00-08:00 WITA "hari ini" di server masih
+# menunjuk tanggal kemarin — laporan harian jadi salah. Karena itu seluruh
+# perhitungan tanggal memakai zona waktu usaha (bawaan: Asia/Makassar).
+TZ_USAHA = os.environ.get("BAKERP_TZ", "Asia/Makassar")
+
+
+def _zona():
+    try:
+        from zoneinfo import ZoneInfo
+        return ZoneInfo(TZ_USAHA)
+    except Exception:
+        return None
+
+
+def sekarang():
+    """Waktu sekarang menurut zona waktu usaha."""
+    z = _zona()
+    return datetime.now(z) if z else datetime.now()
+
+
+def hari_ini():
+    """Tanggal 'hari ini' menurut zona waktu usaha (bukan tanggal UTC server)."""
+    return sekarang().date()
 
 
 class BizError(Exception):
@@ -220,7 +248,7 @@ def init_db(force=False):
 # Util
 # ----------------------------------------------------------------------------
 def now_str():
-    return datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    return sekarang().strftime("%Y-%m-%d %H:%M:%S")
 
 
 def r2(x):
@@ -442,7 +470,7 @@ def create_pembelian(conn, data, user="sistem", user_id=None):
         raise BizError("Minimal satu bahan dengan jumlah > 0.")
     total = 0.0
     no_po = next_number(conn, "pembelian", "no_po", "PO")
-    tanggal = data.get("tanggal") or date.today().isoformat()
+    tanggal = data.get("tanggal") or hari_ini().isoformat()
     cur = conn.execute(
         "INSERT INTO pembelian (no_po, tanggal, supplier_id, total, status, user_id, created_at)"
         " VALUES (?,?,?,?, 'draft', ?, ?)",
@@ -541,7 +569,7 @@ def create_produksi(conn, data, user="sistem", user_id=None):
 
     biaya = r2(sum(k["subtotal"] for k in kebutuhan))
     no_batch = next_number(conn, "produksi", "no_batch", "PRD")
-    tanggal = data.get("tanggal") or date.today().isoformat()
+    tanggal = data.get("tanggal") or hari_ini().isoformat()
     cur = conn.execute(
         "INSERT INTO produksi (no_batch, tanggal, produk_id, qty, biaya_bahan, user_id, catatan, created_at)"
         " VALUES (?,?,?,?,?,?,?,?)",
@@ -607,7 +635,7 @@ def create_penjualan(conn, data, user="sistem", user_id=None):
     total = r2(max(subtotal - diskon, 0))
     metode = data.get("metode") or "Tunai"
     no_inv = next_number(conn, "penjualan", "no_invoice", "INV")
-    tanggal = data.get("tanggal") or date.today().isoformat()
+    tanggal = data.get("tanggal") or hari_ini().isoformat()
     cur = conn.execute(
         "INSERT INTO penjualan (no_invoice, tanggal, subtotal, diskon, total, hpp, metode, user_id, created_at)"
         " VALUES (?,?,?,?,?,?,?,?,?)",
@@ -643,7 +671,7 @@ def create_pengeluaran(conn, data, user="sistem", user_id=None):
     if jumlah <= 0:
         raise BizError("Jumlah pengeluaran harus lebih dari 0.")
     kategori = data.get("kategori") or "Operasional"
-    tanggal = data.get("tanggal") or date.today().isoformat()
+    tanggal = data.get("tanggal") or hari_ini().isoformat()
     cur = conn.execute(
         "INSERT INTO pengeluaran (tanggal, kategori, keterangan, jumlah, user_id) VALUES (?,?,?,?,?)",
         (tanggal, kategori, data.get("keterangan"), r2(jumlah), user_id),
@@ -706,12 +734,12 @@ def laba_rugi(conn, dari, sampai):
 # Laporan & dashboard
 # ----------------------------------------------------------------------------
 def dashboard(conn):
-    hari_ini = date.today().isoformat()
-    awal_bulan = date.today().replace(day=1).isoformat()
+    tgl_ini = hari_ini().isoformat()
+    awal_bulan = hari_ini().replace(day=1).isoformat()
     penjualan_hari = conn.execute(
         "SELECT COALESCE(SUM(total),0) AS v, COUNT(*) AS n FROM penjualan WHERE tanggal=?",
-        (hari_ini,)).fetchone()
-    lr = laba_rugi(conn, awal_bulan, hari_ini)
+        (tgl_ini,)).fetchone()
+    lr = laba_rugi(conn, awal_bulan, tgl_ini)
     stok_kritis = [dict(r) for r in conn.execute(
         """SELECT 'Bahan' AS jenis, kode, nama, stok, stok_min, satuan FROM bahan
            WHERE stok <= stok_min
@@ -725,7 +753,7 @@ def dashboard(conn):
 
     tren = []
     for i in range(6, -1, -1):
-        tgl = (date.today() - timedelta(days=i)).isoformat()
+        tgl = (hari_ini() - timedelta(days=i)).isoformat()
         row = conn.execute(
             "SELECT COALESCE(SUM(total),0) AS v FROM penjualan WHERE tanggal=?", (tgl,)).fetchone()
         tren.append({"tanggal": tgl, "total": r2(row["v"])})
@@ -735,7 +763,7 @@ def dashboard(conn):
            FROM penjualan_item pi JOIN produk p ON p.id = pi.produk_id
            JOIN penjualan s ON s.id = pi.penjualan_id
            WHERE s.tanggal >= ? GROUP BY p.id ORDER BY qty DESC LIMIT 5""",
-        ((date.today() - timedelta(days=30)).isoformat(),)).fetchall()]
+        ((hari_ini() - timedelta(days=30)).isoformat(),)).fetchall()]
 
     terbaru = [dict(r) for r in conn.execute(
         "SELECT no_invoice, tanggal, total, metode FROM penjualan ORDER BY id DESC LIMIT 5").fetchall()]
@@ -917,7 +945,7 @@ def seed(conn, with_history=True):
     produk_ids = [r["id"] for r in conn.execute("SELECT id FROM produk")]
 
     # stok awal gudang (PO pertama, tanggal 31 hari lalu)
-    belanja((date.today() - timedelta(days=31)).isoformat(), hanya_kurang=False)
+    belanja((hari_ini() - timedelta(days=31)).isoformat(), hanya_kurang=False)
 
     def produksi_untuk(pid, qty, tgl):
         try:
@@ -930,8 +958,8 @@ def seed(conn, with_history=True):
                             user="gudang", user_id=gudang_id)
 
     for d in range(30, -1, -1):
-        tgl = (date.today() - timedelta(days=d)).isoformat()
-        weekday = (date.today() - timedelta(days=d)).weekday()
+        tgl = (hari_ini() - timedelta(days=d)).isoformat()
+        weekday = (hari_ini() - timedelta(days=d)).weekday()
 
         # 1) Produksi pagi: isi etalase sampai target stok
         for pid in produk_ids:

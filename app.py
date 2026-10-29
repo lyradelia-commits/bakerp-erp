@@ -22,7 +22,7 @@ import sys
 import threading
 import traceback
 import urllib.parse
-from datetime import date
+from datetime import date  # noqa: F401  (dipertahankan untuk kompatibilitas tipe)
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 
 import core
@@ -249,8 +249,8 @@ def _api_auth(method, res, sub, sub2, q, user, conn, raw_body):
 
     # ---------- Keuangan ----------
     if res == "keuangan":
-        dari = q.get("dari", [date.today().replace(day=1).isoformat()])[0]
-        sampai = q.get("sampai", [date.today().isoformat()])[0]
+        dari = q.get("dari", [core.hari_ini().replace(day=1).isoformat()])[0]
+        sampai = q.get("sampai", [core.hari_ini().isoformat()])[0]
         if sub == "labarugi":
             return ok(core.laba_rugi(conn, dari, sampai))
         if sub == "kas":
@@ -258,8 +258,8 @@ def _api_auth(method, res, sub, sub2, q, user, conn, raw_body):
 
     # ---------- Laporan ----------
     if res == "laporan":
-        dari = q.get("dari", [date.today().replace(day=1).isoformat()])[0]
-        sampai = q.get("sampai", [date.today().isoformat()])[0]
+        dari = q.get("dari", [core.hari_ini().replace(day=1).isoformat()])[0]
+        sampai = q.get("sampai", [core.hari_ini().isoformat()])[0]
         if sub == "stok":
             return ok(core.laporan_stok(conn))
         if sub == "penjualan":

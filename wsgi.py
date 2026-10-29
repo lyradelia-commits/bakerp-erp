@@ -31,6 +31,12 @@ BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 if BASE_DIR not in sys.path:
     sys.path.insert(0, BASE_DIR)
 
+# Zona waktu usaha HARUS diset sebelum core diimpor, karena core membaca
+# variabel ini saat modul dimuat. Server hosting berjalan pada UTC; tanpa ini,
+# antara pukul 00:00-08:00 WITA tanggal "hari ini" masih menunjuk hari
+# sebelumnya sehingga laporan harian salah.
+os.environ.setdefault("BAKERP_TZ", "Asia/Makassar")
+
 import app as bakerp          # noqa: E402
 import core                   # noqa: E402
 

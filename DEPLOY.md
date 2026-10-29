@@ -159,6 +159,22 @@ dan laptop harus tetap menyala.
    Kalau keduanya melihat bahan yang sama → **berhasil**, datanya sudah terpusat.
 4. Cek tab **Web → Error log** kosong dari error.
 
+### Zona waktu
+
+Server hosting berjalan pada **UTC**, sedangkan usaha berada di WITA (UTC+8).
+Tanpa penyesuaian, antara pukul 00:00–08:00 WITA tanggal "hari ini" di server masih
+menunjuk hari sebelumnya, sehingga laporan harian tampak kosong.
+
+Aplikasi sudah menangani ini: `wsgi.py` menyetel `BAKERP_TZ` (bawaan `Asia/Makassar`)
+sebelum `core` diimpor. Untuk zona lain, ubah baris itu:
+
+```python
+os.environ.setdefault("BAKERP_TZ", "Asia/Jakarta")   # WIB (UTC+7)
+```
+
+Verifikasi: `https://<situs>/api/info` — kolom `waktu` harus sama dengan jam dindingmu,
+bukan 8 jam lebih lambat.
+
 ---
 
 ## Catatan keamanan
