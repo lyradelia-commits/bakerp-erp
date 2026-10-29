@@ -5,6 +5,13 @@ persediaan, produksi berbasis resep (BOM), penjualan (POS), dan keuangan dalam s
 
 > Tugas UTS Mata Kuliah Enterprise Information System (EIS)
 
+**Halaman profil proyek:** https://lyradelia-commits.github.io/bakerp-erp/
+
+> **Catatan:** GitHub Pages hanya menyajikan berkas statis, jadi halaman di atas berisi profil
+> proyek, tangkapan layar, dan laporan PDF — bukan aplikasi interaktifnya. Aplikasi BakeERP
+> memerlukan server Python yang berjalan; jalankan secara lokal dengan langkah di bawah, atau
+> bagikan sesi sementara memakai tunnel (lihat bagian *Membagikan demo ke rekan*).
+
 ## Menjalankan aplikasi
 
 Cara tercepat (Windows): klik dua kali **`Mulai BakeERP.bat`** — server dinyalakan dan
@@ -148,6 +155,26 @@ Kedua backend lulus 29/29.
 ```bash
 python core.py     # membuat ulang database + seed 31 hari (backend sesuai BAKERP_BACKEND)
 ```
+
+## Membagikan demo ke rekan
+
+Aplikasi butuh server Python yang hidup, jadi tidak bisa di-host di GitHub Pages.
+Untuk memberi akses sementara tanpa membuat mereka memasang Python, gunakan tunnel SSH
+ke Pinggy (tanpa instalasi, cukup `ssh` bawaan Windows/Linux/macOS):
+
+```bash
+# 1. pastikan aplikasi lokal sudah jalan di port 8000
+python app.py
+
+# 2. buka tunnel (terminal terpisah)
+ssh -p 443 -o StrictHostKeyChecking=no -R0:localhost:8000 free@a.pinggy.io
+```
+
+Pinggy mencetak URL `https://....pinggy.link` yang bisa dibuka siapa pun. Login aplikasi
+tetap diperlukan, jadi data tidak terbuka bagi yang tidak punya akun.
+
+Batasan free tier: tunnel mati otomatis setelah **60 menit**, dan URL berubah setiap kali
+dinyalakan ulang. Cocok untuk demo presentasi, bukan untuk penggunaan permanen.
 
 ## Membangun ulang laporan
 
