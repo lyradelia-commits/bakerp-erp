@@ -67,13 +67,16 @@ Ganti `<username>` dengan username PythonAnywhere-mu.
 Masih di tab **Web**, klik tautan **WSGI configuration file**
 (biasanya `/var/www/<username>_pythonanywhere_com_wsgi.py`).
 
-**Hapus seluruh isinya**, ganti dengan tiga baris ini:
+**Hapus seluruh isinya**, ganti dengan tiga baris ini (bisa langsung di-copy apa adanya):
 
 ```python
-import sys
-sys.path.insert(0, '/home/<username>/bakerp-erp')
+import os, sys
+sys.path.insert(0, os.path.expanduser('~/bakerp-erp'))
 from wsgi import application
 ```
+
+`expanduser('~/bakerp-erp')` otomatis menunjuk `/home/<username>/bakerp-erp`, jadi tidak
+perlu menyesuaikan username secara manual.
 
 Simpan (Ctrl+S).
 
