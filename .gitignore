@@ -1,0 +1,34 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.Python
+
+# Basis data uji & cadangan (data demo bakery.db tetap disertakan)
+tests/test_bakery.db
+*.db.bak
+*.bak
+
+# Log
+*.log
+server.log
+
+# Lingkungan
+.env
+.env.*
+venv/
+.venv/
+env/
+
+# Editor / OS
+.vscode/
+.idea/
+*.swp
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Berkas sementara
+tmp/
+*.tmp

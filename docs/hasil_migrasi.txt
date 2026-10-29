@@ -1,0 +1,45 @@
+================================================================
+  MIGRASI BAKERP: SQLite -> MySQL
+================================================================
+  Sumber : C:\Users\kdkly\Documents\erp-bakery\bakery.db
+  Tujuan : mysql://root@127.0.0.1:3306/bakerp
+
+[1/3] Database MySQL siap.
+[2/3] Skema dibuat: 14 tabel.
+[3/3] Menyalin data...
+
+  Tabel                SQLite    MySQL  Status
+  ------------------------------------------------
+  users                     3        3  OK
+  supplier                  3        3  OK
+  bahan                    12       12  OK
+  produk                    6        6  OK
+  resep                    31       31  OK
+  pembelian                12       12  OK
+  pembelian_item           25       25  OK
+  produksi                185      185  OK
+  produksi_item           956      956  OK
+  penjualan               534      534  OK
+  penjualan_item         1060     1060  OK
+  pengeluaran              14       14  OK
+  kas                     560      560  OK
+  audit                   762      762  OK
+  ------------------------------------------------
+  TOTAL                           4163
+
+Verifikasi relasi & konsistensi:
+  [OK] Resep tanpa produk/bahan (harus 0): 0 (harap 0)
+  [OK] Item penjualan tanpa invoice (harus 0): 0 (harap 0)
+  [OK] Item PO tanpa header (harus 0): 0 (harap 0)
+  [OK] Total nilai penjualan sama dengan SQLite: 71966000.0 (harap 71966000.0)
+  [OK] Jumlah kas masuk sama dengan SQLite: 534 (harap 534)
+
+================================================================
+  MIGRASI BERHASIL — seluruh data & relasi konsisten.
+
+  Jalankan aplikasi dengan backend MySQL:
+     BAKERP_BACKEND=mysql python app.py
+
+  Buka di DBeaver / MySQL Workbench:
+     host=127.0.0.1  port=3306  database=bakerp
+================================================================

@@ -1,0 +1,48 @@
+==========================================================================
+  UJI INTEGRASI SISTEM ERP BAKERY — alur bisnis end-to-end
+==========================================================================
+
+1) Autentikasi & keamanan akses
+  [LULUS] Login dengan password salah ditolak  -> Password salah.
+  [LULUS] Login admin berhasil & token diterbitkan  -> token aktif
+  [LULUS] Akses API tanpa token ditolak (401)
+
+2) Master data: bahan baku, produk, dan resep (BOM)
+  [LULUS] Tambah bahan baku baru  -> id=13
+  [LULUS] Tambah produk baru  -> id=7
+  [LULUS] Simpan resep: 0,5 kg bahan per unit produk  -> HPP/unit = Rp 5.000
+
+3) Modul pembelian & penerimaan barang
+  [LULUS] Buat purchase order (status draft)  -> PO-2026-0013 total Rp 120.000
+  [LULUS] PO draft belum mengubah stok gudang  -> stok = 0.0
+  [LULUS] Terima barang: PO berstatus diterima
+  [LULUS] Integrasi 1: penerimaan menambah stok bahan (0 -> 10 kg)  -> stok = 10.0
+  [LULUS] Integrasi 2: harga beli rata-rata terbarui otomatis  -> harga = Rp 12.000
+  [LULUS] Integrasi 3: penerimaan otomatis mencatat kas keluar  -> kas keluar Rp 120.000
+  [LULUS] PO tidak dapat diterima dua kali (validasi)  -> PO ini sudah diterima sebelumnya.
+
+4) Modul produksi berbasis resep
+  [LULUS] Simulasi kebutuhan bahan: 10 unit butuh 5 kg  -> butuh 5.0 kg, stok 10.0 kg
+  [LULUS] Jalankan produksi 10 unit  -> biaya bahan Rp 60.000
+  [LULUS] Integrasi 4: produksi mengurangi stok bahan sesuai resep (10 -> 5 kg)  -> stok = 5.0 kg
+  [LULUS] Integrasi 5: produksi menambah stok produk jadi (0 -> 10 pcs)  -> stok = 10.0 pcs
+  [LULUS] Produksi ditolak bila stok bahan tidak mencukupi  -> Stok bahan baku tidak mencukupi: Tepung Uji butuh 50.0 kg (stok …
+
+5) Modul penjualan (POS)
+  [LULUS] Transaksi penjualan 3 unit berhasil  -> INV-2026-0535 total Rp 60.000
+  [LULUS] Integrasi 6: HPP ikut berubah mengikuti harga beli terbaru (3 x Rp 6.000)  -> HPP = Rp 18.000
+  [LULUS] Integrasi 7: penjualan mengurangi stok produk jadi (10 -> 7 pcs)  -> stok = 7.0 pcs
+  [LULUS] Integrasi 8: penjualan otomatis mencatat kas masuk  -> kas masuk Rp 60.000
+  [LULUS] Penjualan ditolak bila stok produk tidak cukup  -> Stok Roti Uji tidak cukup (tersedia 7.0). Lakukan produksi t
+
+6) Modul keuangan & pelaporan
+  [LULUS] Catat pengeluaran operasional
+  [LULUS] Laba kotor = pendapatan - HPP  -> pendapatan 2.037.000 - HPP 623.043 = 1.413.957
+  [LULUS] Laba bersih = laba kotor - total beban  -> laba bersih Rp -6.255.302
+  [LULUS] Pengeluaran ikut mengurangi laba bersih
+  [LULUS] Dashboard menyajikan KPI & stok kritis  -> persediaan Rp 23.119.646
+  [LULUS] Jejak audit merekam transaksi penting  -> 100 baris log
+
+==========================================================================
+  HASIL: 29/29 pengujian lulus (100%)
+==========================================================================
