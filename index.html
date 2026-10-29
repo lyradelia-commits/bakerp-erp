@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>BakeERP — Sistem ERP Berbasis Web untuk UMKM Bakery</title>
+<meta name="description" content="BakeERP: aplikasi ERP berbasis web untuk Roti Kita Bakery. Mengintegrasikan pembelian, persediaan, produksi berbasis resep, penjualan (POS), dan keuangan dalam satu basis data. Tugas UTS Enterprise Information System." />
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🥖</text></svg>" />
+<style>
+  :root {
+    --bg: #f7f4ef;
+    --panel: #ffffff;
+    --ink: #241c15;
+    --ink-2: #5b5048;
+    --ink-3: #8c8179;
+    --line: #e7e0d7;
+    --brand: #b45309;
+    --brand-2: #d97706;
+    --brand-soft: #fdf1e0;
+    --side: #221a14;
+    --ok: #157f4b;
+    --ok-soft: #e6f5ec;
+    --warn-soft: #fdf1e0;
+    --font: "Segoe UI", system-ui, -apple-system, "Helvetica Neue", Arial, sans-serif;
+    --mono: "Cascadia Code", Consolas, "SF Mono", Menlo, monospace;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0; background: var(--bg); color: var(--ink);
+    font-family: var(--font); font-size: 16px; line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+  a { color: var(--brand); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  h1, h2, h3 { margin: 0; font-weight: 700; letter-spacing: -.02em; line-height: 1.2; }
+  h1 { font-size: clamp(28px, 4.4vw, 46px); }
+  h2 { font-size: clamp(22px, 2.8vw, 30px); }
+  h3 { font-size: 17px; }
+  p { margin: 0 0 14px; }
+  .wrap { max-width: 1080px; margin: 0 auto; padding: 0 22px; }
+
+  /* ---------- Header ---------- */
+  header {
+    position: sticky; top: 0; z-index: 50;
+    background: rgba(247,244,239,.94); backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--line);
+  }
+  .nav { display: flex; align-items: center; gap: 14px; height: 66px; }
+  .brand { display: flex; align-items: center; gap: 10px; font-weight: 700; font-size: 17px; color: var(--ink); }
+  .brand:hover { text-decoration: none; }
+  .mark {
+    width: 34px; height: 34px; border-radius: 10px; flex: 0 0 34px;
+    background: linear-gradient(135deg, #f59e0b, #b45309);
+    display: grid; place-items: center; color: #fff; font-weight: 800; font-size: 15px;
+  }
+  .nav .spacer { flex: 1; }
+  .nav a.lnk { color: var(--ink-2); font-size: 14.5px; font-weight: 600; }
+  .nav a.lnk:hover { color: var(--brand); text-decoration: none; }
+  @media (max-width: 760px) { .nav a.lnk { display: none; } }
+
+  .btn {
+    display: inline-flex; align-items: center; gap: 8px; justify-content: center;
+    padding: 11px 18px; border-radius: 10px; font-size: 14.5px; font-weight: 650;
+    border: 1px solid var(--line); background: var(--panel); color: var(--ink);
+    cursor: pointer; transition: .15s; text-decoration: none;
+  }
+  .btn:hover { text-decoration: none; transform: translateY(-1px); box-shadow: 0 6px 18px -8px rgba(36,28,21,.3); }
+  .btn.primary { background: linear-gradient(180deg, var(--brand-2), var(--brand)); border-color: var(--brand); color: #fff; }
+  .btn.dark { background: var(--side); border-color: var(--side); color: #fff; }
+  .btn.sm { padding: 8px 13px; font-size: 13.5px; }
+
+  /* ---------- Hero ---------- */
+  .hero {
+    padding: 66px 0 54px;
+    background: radial-gradient(900px 420px at 78% -10%, #fbe9d2, transparent 62%);
+  }
+  .badges { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 20px; }
+  .tag {
+    font-size: 12px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase;
+    padding: 5px 11px; border-radius: 20px; background: var(--brand-soft); color: #8a4a0d;
+    border: 1px solid #f3dfc4;
+  }
+  .tag.ok { background: var(--ok-soft); color: var(--ok); border-color: #c8e9d6; }
+  .hero p.lead { font-size: 18px; color: var(--ink-2); max-width: 640px; margin-top: 18px; }
+  .cta { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 26px; }
+
+  /* ---------- Notice ---------- */
+  .notice {
+    margin-top: 34px; display: flex; gap: 14px; align-items: flex-start;
+    background: #fff8ee; border: 1px solid #f0dcc0; border-left: 4px solid var(--brand-2);
+    border-radius: 12px; padding: 16px 18px;
+  }
+  .notice .ic { font-size: 20px; line-height: 1.3; }
+  .notice b { display: block; margin-bottom: 3px; }
+  .notice p { margin: 0; font-size: 14.5px; color: #6b4a22; }
+
+  /* ---------- Sections ---------- */
+  section { padding: 54px 0; border-top: 1px solid var(--line); }
+  section > .wrap > h2 { margin-bottom: 8px; }
+  .sub { color: var(--ink-3); font-size: 15.5px; margin-bottom: 26px; }
+
+  .grid { display: grid; gap: 16px; }
+  .g3 { grid-template-columns: repeat(3, 1fr); }
+  .g2 { grid-template-columns: repeat(2, 1fr); }
+  @media (max-width: 900px) { .g3, .g2 { grid-template-columns: 1fr; } }
+
+  .card {
+    background: var(--panel); border: 1px solid var(--line); border-radius: 14px;
+    padding: 20px; box-shadow: 0 1px 2px rgba(36,28,21,.04), 0 10px 28px -18px rgba(36,28,21,.25);
+  }
+  .card h3 { margin-bottom: 6px; }
+  .card p { font-size: 14.5px; color: var(--ink-2); margin: 0; }
+  .card .num {
+    font-family: var(--mono); font-size: 12px; font-weight: 700; color: var(--brand);
+    letter-spacing: .06em; margin-bottom: 8px; display: block;
+  }
+
+  /* ---------- Flow ---------- */
+  .flow { display: flex; flex-wrap: wrap; align-items: center; gap: 9px; margin: 8px 0 4px; }
+  .step {
+    background: var(--panel); border: 1px solid var(--line); border-radius: 9px;
+    padding: 8px 13px; font-size: 13.5px; font-weight: 650;
+  }
+  .arrow { color: var(--ink-3); font-weight: 700; }
+
+  /* ---------- Table ---------- */
+  .tw { overflow-x: auto; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+  table { width: 100%; border-collapse: collapse; font-size: 14.5px; }
+  th {
+    text-align: left; padding: 12px 16px; font-size: 11.5px; letter-spacing: .07em;
+    text-transform: uppercase; color: #fff; background: #5b3a1e; font-weight: 700; white-space: nowrap;
+  }
+  td { padding: 11px 16px; border-top: 1px solid #f2ece4; vertical-align: top; }
+  tbody tr:nth-child(even) { background: #fdfbf8; }
+  td.k { font-weight: 650; white-space: nowrap; }
+
+  /* ---------- Code ---------- */
+  pre {
+    background: var(--side); color: #f3ece4; padding: 16px 18px; border-radius: 12px;
+    overflow-x: auto; font-family: var(--mono); font-size: 13px; line-height: 1.65; margin: 0 0 14px;
+  }
+  pre .c { color: #9c8a77; }
+  code.inl {
+    font-family: var(--mono); font-size: 13.5px; background: var(--brand-soft);
+    padding: 2px 6px; border-radius: 5px; color: #8a4a0d;
+  }
+
+  /* ---------- Screenshots ---------- */
+  .shots { display: grid; grid-template-columns: repeat(2, 1fr); gap: 18px; }
+  @media (max-width: 900px) { .shots { grid-template-columns: 1fr; } }
+  figure { margin: 0; }
+  figure img {
+    width: 100%; border-radius: 12px; border: 1px solid var(--line);
+    box-shadow: 0 12px 32px -18px rgba(36,28,21,.4); display: block;
+    background: #fff;
+  }
+  figcaption { font-size: 13px; color: var(--ink-3); margin-top: 9px; text-align: center; font-style: italic; }
+
+  /* ---------- Footer ---------- */
+  footer { padding: 34px 0 46px; border-top: 1px solid var(--line); color: var(--ink-3); font-size: 13.5px; }
+  footer .row { display: flex; flex-wrap: wrap; gap: 10px 22px; justify-content: space-between; align-items: center; }
+
+  .ok-badge { color: var(--ok); font-weight: 700; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap nav">
+    <a class="brand" href="#top"><span class="mark">B</span> BakeERP</a>
+    <div class="spacer"></div>
+    <a class="lnk" href="#modul">Modul</a>
+    <a class="lnk" href="#integrasi">Integrasi</a>
+    <a class="lnk" href="#jalankan">Cara Menjalankan</a>
+    <a class="lnk" href="#tampilan">Tampilan</a>
+    <a class="btn primary sm" href="https://github.com/lyradelia-commits/bakerp-erp" target="_blank" rel="noopener">Lihat Kode</a>
+  </div>
+</header>
+
+<div id="top" class="hero">
+  <div class="wrap">
+    <div class="badges">
+      <span class="tag">Tugas UTS — Enterprise Information System</span>
+      <span class="tag ok">29/29 Uji Integrasi Lulus</span>
+    </div>
+    <h1>Satu sistem untuk seluruh proses bisnis bakery.</h1>
+    <p class="lead">
+      <b>BakeERP</b> menghubungkan pembelian bahan, persediaan, produksi berbasis resep (BOM),
+      penjualan kasir, dan laporan keuangan dalam satu basis data. Satu transaksi cukup diinput
+      sekali, lalu mengalir otomatis ke seluruh modul terkait.
+    </p>
+    <div class="cta">
+      <a class="btn primary" href="https://github.com/lyradelia-commits/bakerp-erp" target="_blank" rel="noopener">Buka Repositori GitHub</a>
+      <a class="btn" href="#jalankan">Cara Menjalankan</a>
+      <a class="btn" href="Laporan_UTS_EIS_ERP_Bakery.pdf" target="_blank" rel="noopener">Baca Laporan (PDF)</a>
+    </div>
+
+    <div class="notice">
+      <span class="ic">ℹ️</span>
+      <div>
+        <b>Catatan: halaman ini hanya profil proyek, bukan aplikasinya.</b>
+        <p>
+          BakeERP adalah aplikasi <b>full-stack</b> (server Python + basis data). GitHub Pages hanya
+          dapat menyajikan berkas statis, sehingga aplikasi interaktifnya tidak bisa berjalan di sini.
+          Untuk mencoba aplikasi yang sesungguhnya, jalankan di komputer Anda dengan langkah pada
+          bagian <a href="#jalankan">Cara Menjalankan</a> — seluruh kode dan data contoh sudah tersedia
+          di repositori.
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<section id="modul">
+  <div class="wrap">
+    <h2>12 halaman fungsional, 6 modul terintegrasi</h2>
+    <p class="sub">Bukan mockup — setiap halaman terhubung ke basis data dan benar-benar mengubah data.</p>
+    <div class="grid g3">
+      <div class="card"><span class="num">01</span><h3>Dashboard</h3>
+        <p>KPI penjualan harian, laba bersih, nilai persediaan, peringatan stok kritis, dan tren 7 hari.</p></div>
+      <div class="card"><span class="num">02</span><h3>Penjualan (POS)</h3>
+        <p>Keranjang, diskon, tiga metode bayar. Stok produk berkurang dan HPP dihitung dari resep.</p></div>
+      <div class="card"><span class="num">03</span><h3>Produksi</h3>
+        <p>Validasi ketersediaan bahan sebelum produksi, lalu bahan berkurang dan produk jadi bertambah.</p></div>
+      <div class="card"><span class="num">04</span><h3>Pembelian</h3>
+        <p>Purchase order ke supplier. Penerimaan barang menambah stok dan memperbarui harga rata-rata.</p></div>
+      <div class="card"><span class="num">05</span><h3>Master Data & Resep</h3>
+        <p>Bahan baku, produk, supplier, dan bill of material penentu HPP per unit.</p></div>
+      <div class="card"><span class="num">06</span><h3>Keuangan & Laporan</h3>
+        <p>Buku kas, laba rugi otomatis, laporan penjualan, produksi, dan posisi persediaan.</p></div>
+    </div>
+  </div>
+</section>
+
+<section id="integrasi">
+  <div class="wrap">
+    <h2>Integrasi antar modul</h2>
+    <p class="sub">Inilah yang membedakan ERP dari sekumpulan aplikasi terpisah: tidak ada input data berulang.</p>
+    <div class="flow">
+      <span class="step">Pembelian bahan</span><span class="arrow">→</span>
+      <span class="step">Stok bahan naik</span><span class="arrow">→</span>
+      <span class="step">Produksi sesuai resep</span><span class="arrow">→</span>
+      <span class="step">Stok produk jadi naik</span><span class="arrow">→</span>
+      <span class="step">Penjualan (POS)</span><span class="arrow">→</span>
+      <span class="step">HPP & pendapatan</span><span class="arrow">→</span>
+      <span class="step">Buku kas & laba rugi</span>
+    </div>
+    <div class="tw" style="margin-top:22px">
+      <table>
+        <thead><tr><th>Transaksi</th><th>Efek pada persediaan</th><th>Efek pada keuangan</th></tr></thead>
+        <tbody>
+          <tr><td class="k">Terima PO</td><td>Stok bahan bertambah; harga rata-rata diperbarui</td><td>Kas keluar sebesar nilai PO</td></tr>
+          <tr><td class="k">Produksi</td><td>Bahan berkurang sesuai resep; produk jadi bertambah</td><td>Biaya bahan tercatat sebagai dasar HPP</td></tr>
+          <tr><td class="k">Penjualan</td><td>Stok produk jadi berkurang</td><td>Kas masuk; pendapatan dan HPP tercatat</td></tr>
+          <tr><td class="k">Pengeluaran</td><td>Tidak berubah</td><td>Kas keluar; menurunkan laba bersih</td></tr>
+          <tr><td class="k">Ubah resep</td><td>Tidak langsung berubah</td><td>Mengubah HPP seluruh transaksi berikutnya</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<section id="jalankan">
+  <div class="wrap">
+    <h2>Cara menjalankan</h2>
+    <p class="sub">Hanya butuh Python 3.10+. Tidak ada paket yang perlu dipasang untuk mode bawaan.</p>
+
+    <div class="grid g2">
+      <div>
+        <h3 style="margin-bottom:10px">1. Ambil kode</h3>
+        <pre>git clone https://github.com/lyradelia-commits/bakerp-erp.git
+cd bakerp-erp</pre>
+
+        <h3 style="margin-bottom:10px">2. Jalankan</h3>
+        <pre>python app.py
+<span class="c"># Windows: bisa juga klik dua kali</span>
+<span class="c"># "Mulai BakeERP.bat"</span></pre>
+
+        <h3 style="margin-bottom:10px">3. Buka browser</h3>
+        <pre>http://localhost:8000</pre>
+      </div>
+      <div>
+        <h3 style="margin-bottom:10px">Akun demo</h3>
+        <div class="tw">
+          <table>
+            <thead><tr><th>Username</th><th>Password</th><th>Peran</th></tr></thead>
+            <tbody>
+              <tr><td class="k">admin</td><td><code class="inl">admin123</code></td><td>Admin / pemilik</td></tr>
+              <tr><td class="k">gudang</td><td><code class="inl">gudang123</code></td><td>Gudang & produksi</td></tr>
+              <tr><td class="k">kasir</td><td><code class="inl">kasir123</code></td><td>Kasir</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p style="font-size:13.5px;color:var(--ink-3);margin-top:12px">
+          Basis data <code class="inl">bakery.db</code> sudah berisi data contoh 31 hari
+          (534 penjualan, 185 batch produksi, 560 baris kas), jadi dashboard dan laporan
+          langsung terisi saat pertama dibuka.
+        </p>
+
+        <h3 style="margin-bottom:10px;margin-top:18px">Mode MySQL (opsional)</h3>
+        <pre>python migrate_to_mysql.py
+BAKERP_BACKEND=mysql python app.py</pre>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="tampilan">
+  <div class="wrap">
+    <h2>Tampilan aplikasi</h2>
+    <p class="sub">Tangkapan layar dari aplikasi yang benar-benar dijalankan di browser.</p>
+    <div class="shots">
+      <figure><img src="img/02-dashboard.png" alt="Dashboard BakeERP" loading="lazy" />
+        <figcaption>Dashboard — KPI, tren 7 hari, dan peringatan stok kritis</figcaption></figure>
+      <figure><img src="img/03-pos-penjualan.png" alt="Modul penjualan POS" loading="lazy" />
+        <figcaption>Penjualan (POS) — keranjang dan riwayat transaksi</figcaption></figure>
+      <figure><img src="img/04-produksi.png" alt="Modul produksi" loading="lazy" />
+        <figcaption>Produksi — kebutuhan bahan dihitung otomatis dari resep</figcaption></figure>
+      <figure><img src="img/07-keuangan.png" alt="Laporan laba rugi" loading="lazy" />
+        <figcaption>Laba rugi & buku kas — terbentuk otomatis dari transaksi</figcaption></figure>
+    </div>
+  </div>
+</section>
+
+<section id="pengujian">
+  <div class="wrap">
+    <h2>Pengujian</h2>
+    <p class="sub">Diuji lewat HTTP API terhadap aplikasi yang berjalan, bukan sekadar klik manual.</p>
+    <div class="grid g3">
+      <div class="card"><h3 class="ok-badge">29 / 29</h3><p>skenario uji integrasi lulus pada backend SQLite</p></div>
+      <div class="card"><h3 class="ok-badge">29 / 29</h3><p>skenario yang sama lulus pada backend MySQL 8</p></div>
+      <div class="card"><h3 class="ok-badge">4.163</h3><p>baris data dimigrasi SQLite → MySQL tanpa selisih</p></div>
+    </div>
+    <pre style="margin-top:22px">python tests/test_integrasi.py                             <span class="c"># SQLite</span>
+BAKERP_TEST_BACKEND=mysql python tests/test_integrasi.py   <span class="c"># MySQL</span></pre>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap row">
+    <div>
+      <b>BakeERP</b> — Roti Kita Bakery · Tugas UTS Enterprise Information System<br />
+      Kadek Lyradelia Pracili
+    </div>
+    <div>
+      <a href="https://github.com/lyradelia-commits/bakerp-erp" target="_blank" rel="noopener">Repositori</a> ·
+      <a href="Laporan_UTS_EIS_ERP_Bakery.pdf" target="_blank" rel="noopener">Laporan PDF</a> ·
+      <a href="https://github.com/lyradelia-commits/bakerp-erp#readme" target="_blank" rel="noopener">Dokumentasi</a>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>
