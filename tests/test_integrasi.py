@@ -27,6 +27,9 @@ URL = f"http://127.0.0.1:{PORT}"
 BACKEND = (os.environ.get("BAKERP_TEST_BACKEND") or "sqlite").strip().lower()
 MYSQL_DB = os.environ.get("BAKERP_TEST_MYSQL_DB", "bakerp_test")
 
+# Pintu masuk yang diuji: "http" (app.py) atau "wsgi" (wsgi.py, seperti hosting)
+ENTRY = (os.environ.get("BAKERP_TEST_ENTRY") or "http").strip().lower()
+
 HASIL = []
 
 
@@ -85,7 +88,8 @@ def main():
         if os.path.exists(DB):
             os.remove(DB)
         env = dict(os.environ, BAKERP_DB=DB, PYTHONIOENCODING="utf-8")
-    srv = subprocess.Popen([sys.executable, "app.py", "--port", str(PORT)], cwd=BASE_DIR,
+    entry_file = "wsgi.py" if ENTRY == "wsgi" else "app.py"
+    srv = subprocess.Popen([sys.executable, entry_file, "--port", str(PORT)], cwd=BASE_DIR,
                            env=env, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
     try:
         if not tunggu_server():
@@ -95,6 +99,7 @@ def main():
         print("  UJI INTEGRASI SISTEM ERP BAKERY — alur bisnis end-to-end")
         print(f"  Backend basis data: {BACKEND.upper()}"
               + (f" (database {MYSQL_DB})" if BACKEND == "mysql" else ""))
+        print(f"  Pintu masuk: {ENTRY.upper()} ({entry_file})")
         print("=" * 74)
 
         # ---------- 1. Autentikasi & otorisasi ----------

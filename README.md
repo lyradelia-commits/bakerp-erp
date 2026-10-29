@@ -157,11 +157,30 @@ Kedua backend lulus 29/29.
 python core.py     # membuat ulang database + seed 31 hari (backend sesuai BAKERP_BACKEND)
 ```
 
-## Membagikan demo ke rekan
+## Deploy ke hosting gratis (data terpusat)
 
-Aplikasi butuh server Python yang hidup, jadi tidak bisa di-host di GitHub Pages.
-Untuk memberi akses sementara tanpa membuat mereka memasang Python, gunakan tunnel SSH
-ke Pinggy (tanpa instalasi, cukup `ssh` bawaan Windows/Linux/macOS):
+Agar **semua orang melihat data yang sama** (bukan salinan sendiri-sendiri), aplikasi harus
+berjalan di server. Panduan lengkap ada di **[DEPLOY.md](DEPLOY.md)**.
+
+Ringkasnya:
+
+| Cara | Data terpusat | Permanen | Perlu akun |
+|---|---|---|---|
+| **PythonAnywhere** (disarankan) | ya | ya | ya, gratis tanpa kartu |
+| Render | ya | tidak (disk sementara) | ya, gratis |
+| Tunnel Pinggy | ya | tidak (60 menit) | tidak |
+
+Aplikasi sudah disiapkan untuk hosting:
+
+- `app.py` otomatis memakai `$PORT` dan mendengarkan `0.0.0.0`
+- `wsgi.py` menyediakan pintu masuk WSGI (dipakai PythonAnywhere)
+- `requirements.txt` + `Procfile` disediakan untuk platform PaaS
+
+Cek apakah deployment berhasil: buka `https://<situs>/api/info`.
+
+## Membagikan demo sementara (tunnel)
+
+Untuk presentasi cepat tanpa membuat akun:
 
 ```bash
 # 1. pastikan aplikasi lokal sudah jalan di port 8000
@@ -172,7 +191,7 @@ ssh -p 443 -o StrictHostKeyChecking=no -R0:localhost:8000 free@a.pinggy.io
 ```
 
 Pinggy mencetak URL `https://....pinggy.link` yang bisa dibuka siapa pun. Login aplikasi
-tetap diperlukan, jadi data tidak terbuka bagi yang tidak punya akun.
+tetap diperlukan, dan karena memakai satu database, semua pengunjung melihat data yang sama.
 
 Batasan free tier: tunnel mati otomatis setelah **60 menit**, dan URL berubah setiap kali
 dinyalakan ulang. Cocok untuk demo presentasi, bukan untuk penggunaan permanen.

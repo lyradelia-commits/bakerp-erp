@@ -35,3 +35,6 @@ tmp/
 
 # Catatan berbagi lokal (URL tunnel bersifat sementara)
 BAGIKAN-ke-rekan.txt
+
+# Cadangan lokal
+*.old

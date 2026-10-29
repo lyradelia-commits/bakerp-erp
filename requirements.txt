@@ -1,0 +1,9 @@
+# BakeERP — dependensi
+#
+# Mode bawaan (SQLite) TIDAK memerlukan paket apa pun: seluruhnya memakai
+# standard library Python. Berkas ini disediakan agar platform hosting
+# (Render, PythonAnywhere, dsb.) bisa menjalankan `pip install -r requirements.txt`
+# tanpa gagal.
+
+# Opsional — hanya bila memakai backend MySQL (BAKERP_BACKEND=mysql)
+pymysql>=1.1.0
