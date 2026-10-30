@@ -175,6 +175,28 @@ os.environ.setdefault("BAKERP_TZ", "Asia/Jakarta")   # WIB (UTC+7)
 Verifikasi: `https://<situs>/api/info` — kolom `waktu` harus sama dengan jam dindingmu,
 bukan 8 jam lebih lambat.
 
+### Letak basis data di server
+
+Berkas `bakery.db` di dalam repo hanyalah **data contoh (seed)**. Basis data yang benar-benar
+dipakai server ditulis ke **`~/bakerp-data/bakery.db`** — di luar folder repo.
+
+Pemisahan ini penting: kalau database ditulis di dalam folder repo, setiap `git pull` akan
+gagal dengan pesan:
+
+```
+error: Your local changes to the following files would be overwritten by merge:
+        bakery.db
+```
+
+Karena sekarang database berada di luar repo, `git pull` untuk memperbarui kode selalu aman
+dan **data tidak pernah hilang**.
+
+Untuk mencadangkan data server:
+
+```bash
+cp ~/bakerp-data/bakery.db ~/backup-bakery-$(date +%Y%m%d).db
+```
+
 ---
 
 ## Catatan keamanan

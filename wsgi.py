@@ -37,6 +37,28 @@ if BASE_DIR not in sys.path:
 # sebelumnya sehingga laporan harian salah.
 os.environ.setdefault("BAKERP_TZ", "Asia/Makassar")
 
+# ---------------------------------------------------------------------------
+# Basis data disimpan DI LUAR folder repo.
+# ---------------------------------------------------------------------------
+# Berkas bakery.db di dalam repo hanyalah DATA CONTOH (seed) yang dibaca sekali.
+# Basis data yang benar-benar dipakai server ditulis ke ~/bakerp-data/bakery.db.
+# Dengan pemisahan ini, `git pull` tidak pernah bentrok dengan berkas yang
+# sedang ditulis server ("Your local changes would be overwritten by merge").
+_DATA_DIR = os.environ.get("BAKERP_DATA_DIR") or os.path.join(
+    os.path.expanduser("~"), "bakerp-data")
+_LIVE_DB = os.path.join(_DATA_DIR, "bakery.db")
+_SEED_DB = os.path.join(BASE_DIR, "bakery.db")
+
+try:
+    os.makedirs(_DATA_DIR, exist_ok=True)
+    if not os.path.exists(_LIVE_DB) and os.path.exists(_SEED_DB):
+        import shutil
+        shutil.copy2(_SEED_DB, _LIVE_DB)
+    os.environ.setdefault("BAKERP_DB", _LIVE_DB)
+except OSError:
+    # Bila folder tidak bisa dibuat, jatuh kembali ke perilaku lama
+    pass
+
 import app as bakerp          # noqa: E402
 import core                   # noqa: E402
 
